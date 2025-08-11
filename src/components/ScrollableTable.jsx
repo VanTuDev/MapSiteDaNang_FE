@@ -6,7 +6,8 @@ export default function ScrollableTable({ data }) {
           <tr className="text-left text-gray-700 border-b">
             <th className="px-4 py-3 font-medium">#</th>
             <th className="px-4 py-3 font-medium">Tên địa điểm</th>
-            <th className="px-4 py-3 font-medium">Loại</th>
+            <th className="px-4 py-3 font-medium">Phân loại</th>
+            <th className="px-4 py-3 font-medium">Loại món</th>
             <th className="px-4 py-3 font-medium">Địa chỉ</th>
             <th className="px-4 py-3 font-medium">Thành phố</th>
             <th className="px-4 py-3 font-medium text-right">Tọa độ</th>
@@ -25,6 +26,18 @@ export default function ScrollableTable({ data }) {
                 <span className="inline-flex items-center rounded-full bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 capitalize">
                   {row.category}
                 </span>
+              </td>
+              <td className="px-4 py-3">
+                <div className="flex flex-wrap gap-1">
+                  {row.productTypes.map((type) => (
+                    <span 
+                      key={type}
+                      className="inline-flex items-center rounded-full bg-green-50 px-2 py-1 text-xs font-medium text-green-700"
+                    >
+                      {type}
+                    </span>
+                  ))}
+                </div>
               </td>
               <td className="px-4 py-3">
                 <div className="max-w-[280px] truncate" title={row.address}>
