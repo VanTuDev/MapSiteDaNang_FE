@@ -1,9 +1,11 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import MapView from "../components/MapView";
-import FiltersPanel from "../components/FiltersPanel";
 import StatsCards from "../components/StatsCards";
-import BuildingsCounter from "../components/BuildingsCounter";
 import ScrollableTable from "../components/ScrollableTable";
+import BuildingsCounter from "../components/BuildingsCounter";
+import FiltersPanel from "../components/FiltersPanel";
+import DensityAnalysis from "../components/DensityAnalysis";
+import Navbar from "../components/Navbar";
 import DaNangJSON from "../data/DaNangData.json";
 import { adaptDaNang, collectCategories, collectProductTypes } from "../lib/poi-adapter";
 import { makeUnionGeometryFromShapes, pointsInGeometry, toBounds } from "../lib/geo-utils";
@@ -44,6 +46,9 @@ export default function Home() {
     const saved = loadFromStorage();
     return saved?.selectedCity || "Toàn quốc";
   });
+  
+  const [activeModal, setActiveModal] = useState(null);
+  const [buildingCount, setBuildingCount] = useState(null);
   
   const [selectedCategories, setSelectedCategories] = useState(() => {
     const saved = loadFromStorage();
@@ -135,101 +140,123 @@ export default function Home() {
       />
 
       <section className="mx-auto max-w-6xl p-4">
-        <div className="mb-4 grid grid-cols-1 gap-3 md:grid-cols-3">
-          {/* City Select */}
-          <div className="rounded border p-3 shadow-sm">
-            <label className="text-xs font-medium text-gray-500">Thành phố</label>
-            <select
-              className="mt-1 w-full rounded border px-2 py-1.5 text-sm focus:border-blue-500 focus:outline-none"
-              value={selectedCity}
-              onChange={(e) => setSelectedCity(e.target.value)}
-            >
-              {cities.map((c) => (
-                <option key={c} value={c}>
-                  {c}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* Filters */}
-          <FiltersPanel
-            cities={cities}
-            selectedCity={selectedCity}
-            setSelectedCity={setSelectedCity}
-            allCategories={ALL_CATEGORIES}
-            selectedCategories={selectedCategories}
-            allProductTypes={ALL_PRODUCT_TYPES}
-            selectedProductTypes={selectedProductTypes}
-            handlers={handlers}
-            totalCategoryInCity={totalCategoryInCity}
-            categoryCounts={categoryCounts}
-          />
-        </div>
-
         <StatsCards
           totalVisible={visiblePOIs.length}
           insideCount={insideIds.size}
         />
 
-        <BuildingsCounter activeShapes={activeShapes} />
 
-        {/* Results Table */}
-        <div className="mt-6">
-          <div className="mb-4 flex items-center justify-between">
-            <div>
-              <h3 className="text-lg font-medium text-gray-900">Kết quả tìm kiếm</h3>
-              <p className="mt-1 text-sm text-gray-500">
-                Hiển thị {insidePOIs.length} địa điểm trong vùng đã chọn
-              </p>
-            </div>
-            <button
-              onClick={() => {
-                if (drawnItemsRef.current) {
-                  drawnItemsRef.current.clearLayers();
-                  setActiveShapes([]);
-                }
-              }}
-              className={`flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium ${
-                activeShapes.length 
-                  ? 'bg-red-50 text-red-600 hover:bg-red-100' 
-                  : 'bg-gray-50 text-gray-400 cursor-not-allowed'
-              }`}
-              disabled={!activeShapes.length}
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
-              </svg>
-              Xóa tất cả vùng vẽ
-            </button>
-          </div>
-          
-          <div className="rounded-lg border shadow-sm">
-            <ScrollableTable data={insidePOIs} />
-          </div>
-          
-          {insidePOIs.length === 0 && activeShapes.length > 0 && (
-            <div className="mt-4 rounded-lg bg-yellow-50 p-4">
-              <div className="flex">
-                <div className="flex-shrink-0">
-                  <svg className="h-5 w-5 text-yellow-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                    <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                  </svg>
-                </div>
-                <div className="ml-3">
-                  <h3 className="text-sm font-medium text-yellow-800">Không tìm thấy kết quả</h3>
-                  <div className="mt-2 text-sm text-yellow-700">
-                    Không có địa điểm nào trong vùng bạn đã chọn. Hãy thử:
-                    <ul className="mt-1 list-disc pl-5">
-                      <li>Mở rộng vùng tìm kiếm</li>
-                      <li>Chọn thêm các loại địa điểm khác</li>
-                      <li>Kiểm tra lại bộ lọc thành phố</li>
-                    </ul>
+
+
+
+        {/* Navbar */}
+        <div className="fixed bottom-0 left-0 right-0 z-[9999]">
+          {/* Modals */}
+          <div className={`fixed inset-x-0 bottom-16 z-[9998] transition-all duration-300 ${activeModal ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
+            <div className="mx-auto max-w-7xl px-4">
+              <div className="rounded-xl bg-white p-6 shadow-2xl max-h-[calc(100vh-200px)] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100">
+                {activeModal === 'search' && (
+                  <div>
+                    <div className="mb-6 flex items-center justify-between">
+                      <h3 className="text-lg font-medium">Kết quả tìm kiếm ({insideIds.size})</h3>
+                      <button
+                        onClick={() => setActiveModal(null)}
+                        className="rounded-full p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-500"
+                      >
+                        <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      </button>
+                    </div>
+                    <div className="max-h-[60vh] overflow-y-auto">
+                      <ScrollableTable data={insidePOIs} />
+                    </div>
                   </div>
-                </div>
+                )}
+
+                {activeModal === 'buildings' && (
+                  <div>
+                    <div className="mb-6 flex items-center justify-between">
+                      <h3 className="text-lg font-medium">Đếm tòa nhà</h3>
+                      <button
+                        onClick={() => setActiveModal(null)}
+                        className="rounded-full p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-500"
+                      >
+                        <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      </button>
+                    </div>
+                    <div className="space-y-6">
+                      <BuildingsCounter 
+                        activeShapes={activeShapes}
+                        onCountChange={setBuildingCount}
+                      />
+                      {activeShapes.length > 0 && (
+                        <>
+                          <div className="border-t border-gray-200"></div>
+                          <DensityAnalysis 
+                            activeShapes={activeShapes}
+                            buildingCount={buildingCount} 
+                          />
+                        </>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {activeModal === 'filters' && (
+                  <div>
+                    <div className="mb-6 flex items-center justify-between">
+                      <h3 className="text-lg font-medium">Bộ lọc</h3>
+                      <button
+                        onClick={() => setActiveModal(null)}
+                        className="rounded-full p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-500"
+                      >
+                        <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      </button>
+                    </div>
+                    <div className="mb-4">
+                      <label className="text-sm font-medium text-gray-700">Thành phố</label>
+                      <select
+                        className="mt-1 w-full rounded-lg border px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
+                        value={selectedCity}
+                        onChange={(e) => setSelectedCity(e.target.value)}
+                      >
+                        {cities.map((c) => (
+                          <option key={c} value={c}>{c}</option>
+                        ))}
+                      </select>
+                    </div>
+                    <FiltersPanel
+                      cities={cities}
+                      selectedCity={selectedCity}
+                      setSelectedCity={setSelectedCity}
+                      allCategories={ALL_CATEGORIES}
+                      selectedCategories={selectedCategories}
+                      allProductTypes={ALL_PRODUCT_TYPES}
+                      selectedProductTypes={selectedProductTypes}
+                      handlers={handlers}
+                      totalCategoryInCity={totalCategoryInCity}
+                      categoryCounts={categoryCounts}
+                    />
+                  </div>
+                )}
               </div>
             </div>
-          )}
+          </div>
+
+          {/* Navbar */}
+          <Navbar 
+            onClearShapes={() => setActiveShapes([])}
+            hasActiveShapes={activeShapes.length > 0}
+            insideCount={insideIds.size}
+            drawnItemsRef={drawnItemsRef}
+            activeTab={activeModal}
+            setActiveModal={setActiveModal}
+          />
         </div>
       </section>
     </main>

@@ -20,18 +20,18 @@ export default function FiltersPanel({
   categoryCounts,
 }) {
   return (
-    <div className="rounded border p-3 shadow-sm md:col-span-2">
-      <div className="mb-2 flex items-center justify-between">
-        <span className="text-sm font-medium">Bộ lọc</span>
+    <div className="rounded-lg border p-4 shadow-sm md:col-span-2">
+      <div className="mb-4 flex items-center justify-between">
+        <span className="text-lg font-medium">Bộ lọc</span>
         <div className="flex gap-2">
           <button 
-            className="rounded bg-blue-50 px-2 py-0.5 text-xs text-blue-600 hover:bg-blue-100" 
+            className="rounded-lg bg-blue-50 px-3 py-1.5 text-sm font-medium text-blue-600 hover:bg-blue-100 transition-colors" 
             onClick={() => { handlers.selectAllCategories(); handlers.selectAllProductTypes(); }}
           >
             Chọn tất cả
           </button>
           <button 
-            className="rounded bg-gray-50 px-2 py-0.5 text-xs text-gray-600 hover:bg-gray-100" 
+            className="rounded-lg bg-gray-50 px-3 py-1.5 text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors" 
             onClick={() => { handlers.clearAllCategories(); handlers.clearAllProductTypes(); }}
           >
             Bỏ chọn tất cả
@@ -60,7 +60,7 @@ export default function FiltersPanel({
                   </button>
                 </div>
               </div>
-              <div className="grid grid-cols-3 gap-3">
+              <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
                 {allCategories.map((c) => {
                   const checked = selectedCategories.has(c);
                   const meta = CATEGORY_METADATA[c] || CATEGORY_METADATA.other;
@@ -70,7 +70,7 @@ export default function FiltersPanel({
                   return (
                     <label 
                       key={c} 
-                      className={`flex cursor-pointer items-start gap-3 rounded-lg border p-3 transition-colors ${
+                      className={`flex cursor-pointer items-start gap-3 rounded-lg border p-4 transition-colors hover:shadow-md ${
                         checked 
                           ? 'bg-blue-50 border-blue-200 hover:bg-blue-100' 
                           : 'hover:bg-gray-50'
@@ -85,7 +85,7 @@ export default function FiltersPanel({
                       />
                       <div className="flex-1">
                         <div className="flex items-center gap-1.5">
-                          <span className="text-xl" role="img" aria-label={c}>
+                          <span className="text-2xl" role="img" aria-label={c}>
                             {meta.icon}
                           </span>
                           <span className="text-sm font-medium capitalize">
