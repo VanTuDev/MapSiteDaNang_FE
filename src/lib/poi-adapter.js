@@ -58,9 +58,59 @@ export function adaptDaNang(data) {
  * @param {string} productType - Chuỗi productType, có thể chứa nhiều loại phân cách bởi dấu phẩy
  * @returns {Array} Mảng các productType đã được chuẩn hóa
  */
+import { FOOD_TYPE_METADATA, SHOP_TYPE_METADATA } from './categories';
+
+function normalizeProductType(type) {
+   if (!type) return "other";
+
+   // Chuẩn hóa type
+   const normalized = type.toLowerCase().trim();
+
+   // Map các type tương đương
+   const typeMap = {
+      // Noodles
+      'noodles & congee': 'noodles-congee',
+      'mì & cháo': 'noodles-congee',
+      'noodle': 'noodles',
+      'mì': 'noodles',
+
+      // Drinks
+      'coffee - tea - juice': 'coffee-tea-juice',
+      'milk tea': 'milk-tea',
+      'trà sữa': 'milk-tea',
+
+      // Bakery
+      'traditional cake': 'traditional-cake',
+      'bánh truyền thống': 'traditional-cake',
+
+      // Special
+      'healthy food': 'healthy-food',
+      'healthy - salad': 'healthy-food',
+      'hotpot & grill': 'hotpot-grill',
+      'lẩu & nướng': 'hotpot-grill',
+
+      // Ranking
+      'tạp dề bạc': 'silver-apron',
+      'tạp dề vàng': 'gold-apron',
+
+      // Shop
+      'official brand store': 'official-brand',
+      'alcohol-beer': 'alcohol-beer',
+      'rượu bia': 'alcohol-beer',
+   };
+
+   return typeMap[normalized] || normalized;
+}
+
 function normalizeProductTypes(productType) {
    if (!productType) return ["other"];
-   return productType.split(",").map(type => type.trim());
+
+   // Split và chuẩn hóa từng type
+   const types = productType.split(",")
+      .map(t => normalizeProductType(t.trim()))
+      .filter(Boolean); // Loại bỏ empty strings
+
+   return types.length ? types : ["other"];
 }
 
 /**

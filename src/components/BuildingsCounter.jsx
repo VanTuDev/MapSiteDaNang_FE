@@ -2,7 +2,7 @@ import { useState, useCallback } from "react";
 import { buildOverpassQLFromGeometry, fetchOverpassCounts } from "../lib/overpass";
 import { makeUnionGeometryFromShapes } from "../lib/geo-utils";
 
-export default function BuildingsCounter({ activeShapes }) {
+export default function BuildingsCounter({ activeShapes, onCountChange }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [count, setCount] = useState(null); 
@@ -25,6 +25,7 @@ export default function BuildingsCounter({ activeShapes }) {
       const controller = new AbortController();
       const { total } = await fetchOverpassCounts(ql, controller.signal);
       setCount(total);
+      onCountChange?.(total);
     } catch (err) {
       setError(err.message);
     } finally {

@@ -1,6 +1,6 @@
 {
-  "name": "POS Bahung - Hệ thống quản lý bán hàng",
-  "short_name": "POS Bahung",
+  "name": "MAP FNB",
+  "short_name": "MAP FNB",
   "description": "Hệ thống quản lý bán hàng dành cho doanh nghiệp vừa và nhỏ",
   "start_url": "/login",
   "display": "standalone",
@@ -19,6 +19,9 @@
   "related_applications": [],
   "orientation": "portrait",
   "lang": "vi-VN",
-  "categories": ["business", "productivity"],
+  "categories": [
+    "business",
+    "productivity"
+  ],
   "screenshots": []
-} 
+}

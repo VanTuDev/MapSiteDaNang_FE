@@ -1,5 +1,5 @@
 // =================================================================
-// SERVICE WORKER CHO POS BAHUNG
+// SERVICE WORKER CHO 
 // =================================================================
 // File này xử lý:
 // 1. Cache và cung cấp nội dung khi offline
@@ -11,12 +11,6 @@ const CACHE_NAME = 'pos-bahung-v1';
 // Đây là các tệp quan trọng để ứng dụng khởi động được khi không có mạng
 const urlsToCache = [
    '/',
-   '/login',
-   '/index.html',
-   '/logo.svg',
-   '/src/main.jsx',
-   '/src/App.jsx',
-   '/src/pages/auth/LoginPage.jsx'
 ];
 
 // In thông báo khi Service Worker được tải lần đầu
