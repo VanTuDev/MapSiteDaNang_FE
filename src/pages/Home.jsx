@@ -46,20 +46,20 @@ export default function Home() {
     const saved = loadFromStorage();
     return saved?.selectedCity || "Toàn quốc";
   });
-  
+
   const [activeModal, setActiveModal] = useState(null);
   const [buildingCount, setBuildingCount] = useState(null);
-  
+
   const [selectedCategories, setSelectedCategories] = useState(() => {
     const saved = loadFromStorage();
-    return new Set(saved?.selectedCategories || ALL_CATEGORIES);
+    return new Set(saved?.selectedCategories || []);
   });
-  
+
   const [selectedProductTypes, setSelectedProductTypes] = useState(() => {
     const saved = loadFromStorage();
-    return new Set(saved?.selectedProductTypes || ALL_PRODUCT_TYPES);
+    return new Set(saved?.selectedProductTypes || []);
   });
-  
+
   const [activeShapes, setActiveShapes] = useState([]);
 
   // Lưu filters vào localStorage
@@ -76,15 +76,15 @@ export default function Home() {
     () => (selectedCity === "Toàn quốc" ? POIS : POIS.filter((p) => p.city === selectedCity)),
     [selectedCity]
   );
-  
+
   const visiblePOIs = useMemo(
-    () => baseByCity.filter((p) => 
-      selectedCategories.has(p.category) && 
+    () => baseByCity.filter((p) =>
+      selectedCategories.has(p.category) &&
       p.productTypes.some(type => selectedProductTypes.has(type))
     ),
     [baseByCity, selectedCategories, selectedProductTypes]
   );
-  
+
   const currentBounds = useMemo(() => toBounds(baseByCity), [baseByCity]);
 
   const { insideIds, categoryCounts } = useMemo(() => {
@@ -115,7 +115,7 @@ export default function Home() {
     },
     selectAllCategories: () => setSelectedCategories(new Set(ALL_CATEGORIES)),
     clearAllCategories: () => setSelectedCategories(new Set()),
-    
+
     toggleProductType: (type) => {
       setSelectedProductTypes((prev) => {
         const next = new Set(prev);
@@ -188,16 +188,16 @@ export default function Home() {
                       </button>
                     </div>
                     <div className="space-y-6">
-                      <BuildingsCounter 
+                      <BuildingsCounter
                         activeShapes={activeShapes}
                         onCountChange={setBuildingCount}
                       />
                       {activeShapes.length > 0 && (
                         <>
                           <div className="border-t border-gray-200"></div>
-                          <DensityAnalysis 
+                          <DensityAnalysis
                             activeShapes={activeShapes}
-                            buildingCount={buildingCount} 
+                            buildingCount={buildingCount}
                           />
                         </>
                       )}
@@ -249,7 +249,7 @@ export default function Home() {
           </div>
 
           {/* Navbar */}
-          <Navbar 
+          <Navbar
             onClearShapes={() => setActiveShapes([])}
             hasActiveShapes={activeShapes.length > 0}
             insideCount={insideIds.size}

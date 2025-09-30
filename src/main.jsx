@@ -2,6 +2,7 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import L from "leaflet";
 import App from "./App.jsx";
+import { registerSW } from 'virtual:pwa-register';
 
 // Import CSS
 import "leaflet/dist/leaflet.css";
@@ -25,3 +26,8 @@ createRoot(document.getElementById("root")).render(
     <App />
   </StrictMode>
 );
+
+// Đăng ký Service Worker cho PWA
+if (typeof window !== 'undefined') {
+  registerSW({ immediate: true });
+}
